@@ -61,74 +61,63 @@ Price range, Aggregate rating, Rating color, Rating text, Votes
 ## Project Structure
 
 ```
-zomato-eda/
-│
-├── data/
-│   └── zomato.csv              ← raw dataset (download from Kaggle)
-│
-├── notebooks/
-│   └── zomato_eda.ipynb        ← main analysis notebook
-│
-├── images/                     ← exported plot screenshots
-│   ├── missing_values.png
-│   ├── rating_distribution.png
-│   ├── top_cuisines.png
-│   ├── rating_vs_delivery.png
-│   └── correlation_heatmap.png
-│
-└── README.md
+zomato-eda/   
+│   
+├── data/   
+│   └── zomato.csv              ← raw dataset (download from Kaggle)      
+│         
+├── images/                     ← exported plot screenshots      
+│   ├── missing_values.png   
+│   ├── rating_distribution.png   
+│   ├── top_cuisines.png   
+│   ├── rating_vs_delivery.png   
+│   └── correlation_heatmap.png   
+│     
+├── notebooks/   
+│   └── zomato_eda.ipynb        ← main analysis notebook   
+│  
+│  
+└── README.md   
 ```
-
----
 
 ## Analysis Walkthrough
 
-### 1. Data Loading & First Look
-Loaded the dataset with `latin-1` encoding (required due to special characters in restaurant names). Confirmed shape of **9,551 rows × 21 columns** and reviewed data types.
-
-### 2. Missing Value Analysis
-Found missing values only in the `Cuisines` column — a very small proportion of the total dataset. Decision: **dropped null rows** since the count was negligible and imputation for cuisine names isn't meaningful.
-
-```python
-data.dropna(inplace=True)
-# Result: 0 missing values, 0 duplicate rows
-```
-
-### 3. Summary Statistics
-Computed `.describe()` for numerical columns. Key observations: rating ranges from 0 to 5, votes are heavily right-skewed, and price range is encoded as 1–4.
-
-### 4. Univariate Analysis
-- **Rating distribution:** Plotted with `sns.histplot` + KDE curve. Ratings cluster around **3.5–4.5** with very few restaurants below 2.5.
-- **Top cuisines:** Bar chart of most frequent cuisine types across all restaurants.
-- **Price range distribution:** Majority of restaurants fall in price range 1–2 (budget-friendly).
-
-### 5. Bivariate Analysis
-- **Rating vs Online Delivery:** Box plots comparing ratings for restaurants with/without online delivery.
-- **Rating vs Table Booking:** Restaurants offering table booking tend to skew towards higher ratings.
-- **Votes vs Rating:** Scatter plot showing moderate positive relationship.
-
-### 6. Correlation Analysis
-Built a correlation heatmap for numerical features: `Aggregate rating`, `Votes`, `Price range`, `Average Cost for two`.
-
-```python
-sns.heatmap(corr, annot=True, cmap="coolwarm", fmt=".2f", linewidths=0.5)
-```
+1. **Data Overview** — shape, dtypes, head(), info()
+2. **Missing Values & Duplicates** — null counts, bar chart, decision to drop
+3. **Summary Statistics** — numerical and categorical describe
+4. **Top Cities** — most represented cities in the dataset
+5. **Country-Level Analysis** — restaurant count and avg rating per country
+6. **Top Restaurant Chains** — most frequent restaurant names
+7. **Rating Distribution** — histogram + KDE, filtered for rated restaurants only
+8. **Votes Distribution** — skewness of the long-tail vote distribution
+9. **Price Range Analysis** — distribution + avg rating by price tier
+10. **Online Delivery Impact** — delivery availability vs average rating
+11. **Table Booking vs Rating** — booking availability vs average rating
+12. **Cuisine Analysis** — top 15 cuisines, avg rating per cuisine, cuisine vs delivery
+13. **Correlation Heatmap** — numeric features: rating, votes, cost, price range
 
 ---
 
 ## Key Insights
+ - **India dominates the dataset** — Around 90% of the restaurants are from India, even though the dataset is labeled as global.
 
-1. **Ratings cluster around 3.5–4.5** — the platform leans positive; very few restaurants fall below 2.5 or above 4.8.
+ - **Most restaurants are unrated** — A significant number of restaurants have an Aggregate Rating of 0.0, likely representing newly listed or inactive restaurants.
 
-2. **Rating vs Votes (~0.4–0.5 correlation)** — Moderate positive relationship. Restaurants with more engagement tend to maintain higher ratings, suggesting social proof matters.
+ - **Ratings mostly cluster between 3.0 and 4.5** — The platform generally leans positive, with very few restaurants rated below 2.5 or above 4.8.
 
-3. **Price range vs Rating (~0.4 correlation)** — Higher price-tier restaurants score marginally better, but the effect is moderate — expensive doesn't guarantee excellent.
+ - **Votes distribution is highly skewed** — A small fraction of restaurants receive the majority of customer votes, while most restaurants have very low engagement.
 
-4. **Average Cost for Two ≈ no correlation** — Raw cost has almost no predictive value for ratings. It's the *price category* (1–4) that captures more signal than the exact number.
+ - **North Indian and Chinese cuisines are the most common** — These cuisines dominate the dataset in terms of restaurant count.
 
-5. **Votes are heavily skewed** — A small number of restaurants receive the majority of votes. Most restaurants have very few reviews, which may inflate or deflate their ratings.
+ - **Rating vs Votes shows a moderate positive correlation (~0.4–0.5)** — Restaurants with higher engagement generally maintain better ratings, suggesting popularity and customer trust influence perception.
 
-6. **Online delivery & table booking** — Restaurants offering these features tend to appear in slightly higher rating brackets, possibly because they serve higher-demand urban markets.
+ - **Higher price ranges tend to have higher ratings** — Fine-dining and premium restaurants are generally rated better, though higher cost does not always guarantee quality.
+
+ - **Average Cost for Two has little to no correlation with ratings** — Exact spending amount alone is not a reliable predictor of customer satisfaction.
+
+ - **Table booking positively impacts ratings more than online delivery** — Restaurants offering table booking are more consistently associated with higher ratings.
+
+ - **Online delivery is associated with slightly higher ratings** — Restaurants providing delivery services tend to perform better, especially in high-demand urban areas.
 
 ---
 
@@ -181,8 +170,9 @@ jupyter notebook notebooks/zomato_eda.ipynb
 ---
 
 ## Next Steps
-
-- [ ] Add geo-visualization (Folium map of restaurant density by country)
+-  This EDA lays the groundwork for:
+-  Rating prediction** — regression model using price range, votes, and cuisine as features
+- [ ] Restaurant recommender** — content-based filtering on cuisine + location
+- [ ] Geo-visualisation** — plotting restaurants on a world map using Folium
 - [ ] Build a **rating prediction model** using the cleaned features (regression)
-- [ ] Cuisine-level deep dive — which cuisines consistently rate highest?
 - [ ] Deploy findings as an interactive dashboard (Streamlit)
